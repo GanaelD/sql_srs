@@ -7,15 +7,12 @@ st.write("Hello world!")
 data = {"a": [1, 2, 3], "b": [4, 5, 6]}
 df = pd.DataFrame(data)
 
-tab1, tab2, tab3 = st.tabs(["Cat", "Dog", "Owl"])
+tab1, tab2, tab3 = st.tabs(["SQL", "Dog", "Owl"])
 
-last_query: Optional[str] = None
 with tab1:
     query: Optional[str] = st.text_area(label="Enter your SQL query. Dataframe name: 'df'")
-    if last_query:
-        st.write(f"Last query: {last_query}")
     if query:
-        last_query = query
+        st.write(f"Last query: {query}")
         queried_df = duckdb.query(query).df()
         st.dataframe(queried_df)
     else:
