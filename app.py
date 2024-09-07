@@ -4,21 +4,6 @@ import duckdb
 import io
 from typing import Optional
 
-st.write("""
-# SQL SRS
-Spaced Repetition System SQL practice
-""")
-
-with st.sidebar:
-    option: Optional[str] = st.selectbox(
-        "What would you like to review?",
-        ("Joins", "GroupBy", "Window Functions"),
-        index=None,
-        placeholder="Select a theme..."
-    )
-
-    st.write(f"You selected: {option}")
-
 csv = """
 beverage,price
 Orange juice,2.5
@@ -41,6 +26,21 @@ CROSS JOIN food_items
 """
 
 solution = duckdb.query(answer).df()
+
+st.write("""
+# SQL SRS
+Spaced Repetition System SQL practice
+""")
+
+with st.sidebar:
+    option: Optional[str] = st.selectbox(
+        "What would you like to review?",
+        ("Joins", "GroupBy", "Window Functions"),
+        index=None,
+        placeholder="Select a theme..."
+    )
+
+    st.write(f"You selected: {option}")
 
 st.header("Enter your code:")
 query: Optional[str] = st.text_area(label="Enter your SQL query. Dataframe name: 'df'", key="user_input")
