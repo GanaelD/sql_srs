@@ -20,12 +20,12 @@ Muffin,3
 """
 food_items = pd.read_csv(io.StringIO(csv2))
 
-answer = """
+ANSWER_STR = """
 SELECT * FROM beverages
 CROSS JOIN food_items
 """
 
-solution = duckdb.query(answer).df()
+solution_df = duckdb.query(ANSWER_STR).df()
 
 st.write("""
 # SQL SRS
@@ -46,8 +46,20 @@ st.header("Enter your code:")
 query: Optional[str] = st.text_area(label="Enter your SQL query. Dataframe name: 'df'", key="user_input")
 if query:
     st.write(f"Last query: {query}")
-    queried_df = duckdb.query(query).df()
-    st.dataframe(queried_df)
+    result = duckdb.query(query).df()
+    st.dataframe(result)
+
+    try:
+        result = result[solution_df.columns]
+        st.dataframe(result.compare(solution_df))
+    except KeyError:
+        st.write("Some columns are missing")
+
+    n_lines_difference = result.shape[0] - solution_df.shape[0]
+    if n_lines_difference != 0:
+        st.write(
+            f"Result has a {n_lines_difference} lines difference with the solution df"
+        )
 
 tab2, tab3 = st.tabs(["Tables", "Answer"])
 
@@ -59,7 +71,7 @@ with tab2:
     st.dataframe(food_items)
 
     st.write("Expected:")
-    st.dataframe(solution)
+    st.dataframe(solution_df)
 
 with tab3:
-    st.write(answer)
+    st.write(ANSWER_STR)
