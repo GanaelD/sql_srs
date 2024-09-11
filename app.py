@@ -1,24 +1,25 @@
+# pylint: disable=missing-module-docstring
+import io
+from typing import Optional
 import streamlit as st
 import pandas as pd
 import duckdb
-import io
-from typing import Optional
 
-csv = """
+CSV = """
 beverage,price
 Orange juice,2.5
 Expresso,2
 Tea,3
 """
-beverages = pd.read_csv(io.StringIO(csv))
+beverages = pd.read_csv(io.StringIO(CSV))
 
-csv2 = """
+CSV2 = """
 food_item,food_price
 Cookie,2.5
 Pain au chocolat,2
 Muffin,3
 """
-food_items = pd.read_csv(io.StringIO(csv2))
+food_items = pd.read_csv(io.StringIO(CSV2))
 
 ANSWER_STR = """
 SELECT * FROM beverages
@@ -27,23 +28,27 @@ CROSS JOIN food_items
 
 solution_df = duckdb.query(ANSWER_STR).df()
 
-st.write("""
+st.write(
+    """
 # SQL SRS
 Spaced Repetition System SQL practice
-""")
+"""
+)
 
 with st.sidebar:
     option: Optional[str] = st.selectbox(
         "What would you like to review?",
         ("Joins", "GroupBy", "Window Functions"),
         index=None,
-        placeholder="Select a theme..."
+        placeholder="Select a theme...",
     )
 
     st.write(f"You selected: {option}")
 
 st.header("Enter your code:")
-query: Optional[str] = st.text_area(label="Enter your SQL query. Dataframe name: 'df'", key="user_input")
+query: Optional[str] = st.text_area(
+    label="Enter your SQL query. Dataframe name: 'df'", key="user_input"
+)
 if query:
     st.write(f"Last query: {query}")
     result = duckdb.query(query).df()
