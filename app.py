@@ -1,9 +1,10 @@
 # pylint: disable=missing-module-docstring
 import io
 from typing import Optional
-import streamlit as st
-import pandas as pd
+
 import duckdb
+import pandas as pd
+import streamlit as st
 
 CSV = """
 beverage,price
