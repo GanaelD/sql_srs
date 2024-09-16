@@ -1,8 +1,11 @@
 # pylint: disable=missing-module-docstring
+import logging
 from typing import Optional
 
 import duckdb
 import streamlit as st
+
+logging.basicConfig(level=logging.DEBUG)
 
 con = duckdb.connect(database="data/exercises_sql_tables.duckdb", read_only=False)
 
@@ -25,16 +28,16 @@ with st.sidebar:
     st.write(f"You selected: {theme}")
 
     exercise = con.execute(f"SELECT * FROM memory_state WHERE theme = '{theme}'").df()
-    st.write(exercise)
+    st.dataframe(exercise)
 
 st.header("Enter your code:")
 query: Optional[str] = st.text_area(
     label="Enter your SQL query. Dataframe name: 'df'", key="user_input"
 )
-# if query:
-#     st.write(f"Last query: {query}")
-#     result = duckdb.query(query).df()
-#     st.dataframe(result)
+if query:
+    st.write(f"Last query: {query}")
+    result = con.execute(query).df()
+    st.dataframe(result)
 #
 #     try:
 #         result = result[solution_df.columns]
@@ -48,17 +51,20 @@ query: Optional[str] = st.text_area(
 #             f"Result has a {n_lines_difference} lines difference with the solution df"
 #         )
 #
-# tab2, tab3 = st.tabs(["Tables", "Answer"])
-#
-# with tab2:
-#     st.write("Table: beverages")
-#     st.dataframe(beverages)
-#
-#     st.write("Table: food_items")
-#     st.dataframe(food_items)
+tab2, tab3 = st.tabs(["Tables", "Answer"])
+
+with tab2:
+    exercise_tables = exercise.loc[0, "tables"]
+    for table in exercise_tables:
+        st.write(f"Table: {table}")
+        table_df = con.execute(f"SELECT * FROM {table}").df()
+        st.dataframe(table_df)
 #
 #     st.write("Expected:")
 #     st.dataframe(solution_df)
 #
-# with tab3:
-#     st.write(ANSWER_STR)
+with tab3:
+    exercise_name = exercise.loc[0, "exercise_name"]
+    with open(f"answers/{exercise_name}.sql", "r") as f:
+        answer = f.read()
+    st.write(answer)
