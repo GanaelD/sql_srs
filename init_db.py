@@ -1,3 +1,4 @@
+# pylint: disable=missing-module-docstring
 import io
 
 import duckdb
@@ -9,10 +10,18 @@ con = duckdb.connect(database="data/exercises_sql_tables.duckdb", read_only=Fals
 # EXERCISES LIST
 # ------------------------------------------------------------
 data = {
-    "theme": ["Joins", ],
-    "exercise_name": ["beverages_and_food", ],
-    "tables": [["beverages", "food_items"], ],
-    "last_reviewed": ["1970-01-01", ],
+    "theme": [
+        "joins",
+    ],
+    "exercise_name": [
+        "beverages_and_food",
+    ],
+    "tables": [
+        ["beverages", "food_items"],
+    ],
+    "last_reviewed": [
+        "1970-01-01",
+    ],
 }
 memory_state_df = pd.DataFrame(data)
 con.execute("CREATE OR REPLACE TABLE memory_state AS SELECT * FROM memory_state_df")
