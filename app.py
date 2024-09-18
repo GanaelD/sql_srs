@@ -1,8 +1,8 @@
 # pylint: disable=missing-module-docstring
-import os
-import sys
-import subprocess
 import logging
+import os
+import subprocess
+import sys
 from typing import Optional
 
 import duckdb
@@ -10,17 +10,17 @@ import streamlit as st
 
 logging.basicConfig(level=logging.DEBUG)
 
-# Check that the 'data' folder containing the DB exists. Otherwise create it
+# Check that the 'data' folder containing the DB exists. Otherwise, create it
 folder_content = os.listdir()
 if "data" not in folder_content:
-    logging.debug(f"Current directory content: {folder_content}")
+    logging.debug("Current directory content: %s", folder_content)
     logging.debug("Creating data folder")
     os.mkdir("data")
 
 # If the DB doesn't exist, create it using init_db.py script
 DB_FILE_NAME = "exercises_sql_tables.duckdb"
 if DB_FILE_NAME not in os.listdir("data"):
-    subprocess.run([sys.executable, "init_db.py"])
+    subprocess.run([sys.executable, "init_db.py"], check=False)
 
 
 con = duckdb.connect(database="data/exercises_sql_tables.duckdb", read_only=False)
