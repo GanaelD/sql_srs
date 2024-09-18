@@ -1,11 +1,27 @@
 # pylint: disable=missing-module-docstring
 import logging
+import os
+import subprocess
+import sys
 from typing import Optional
 
 import duckdb
 import streamlit as st
 
 logging.basicConfig(level=logging.DEBUG)
+
+# Check that the 'data' folder containing the DB exists. Otherwise, create it
+folder_content = os.listdir()
+if "data" not in folder_content:
+    logging.debug("Current directory content: %s", folder_content)
+    logging.debug("Creating data folder")
+    os.mkdir("data")
+
+# If the DB doesn't exist, create it using init_db.py script
+DB_FILE_NAME = "exercises_sql_tables.duckdb"
+if DB_FILE_NAME not in os.listdir("data"):
+    subprocess.run([sys.executable, "init_db.py"], check=False)
+
 
 con = duckdb.connect(database="data/exercises_sql_tables.duckdb", read_only=False)
 
@@ -25,19 +41,22 @@ with st.sidebar:
     )
     st.write(f"You selected: {theme}")
 
-    exercise = con.execute(f"SELECT * FROM memory_state WHERE theme = '{theme}'").df()
-    st.dataframe(exercise)
+    exercises = (
+        con.execute(f"SELECT * FROM memory_state WHERE theme = '{theme}'")
+        .df()
+        .sort_values("last_reviewed")
+        .reset_index()
+    )
+    st.dataframe(exercises)
 
-    exercise_name = exercise.loc[0, "exercise_name"]
+    exercise_name = exercises.loc[0, "exercise_name"]
     with open(f"answers/{exercise_name}.sql", "r", encoding="utf-8") as f:
         answer = f.read()
 
     solution_df = con.execute(answer).df()
 
 st.header("Enter your code:")
-query: Optional[str] = st.text_area(
-    label="Enter your SQL query. Dataframe name: 'df'", key="user_input"
-)
+query: Optional[str] = st.text_area(label="Your SQL query goes here", key="user_input")
 if query:
     st.write(f"Last query: {query}")
     result = con.execute(query).df()
@@ -63,7 +82,7 @@ if query:
 tab2, tab3 = st.tabs(["Tables", "Answer"])
 
 with tab2:
-    exercise_tables = exercise.loc[0, "tables"]
+    exercise_tables = exercises.loc[0, "tables"]
     for table in exercise_tables:
         st.write(f"Table: {table}")
         table_df = con.execute(f"SELECT * FROM {table}").df()
