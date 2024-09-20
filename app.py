@@ -42,9 +42,9 @@ with st.sidebar:
     )
     if theme:
         st.write(f"You selected: {theme}")
-        select_exercise_query = f"SELECT * FROM memory_state WHERE theme = '{theme}'"
+        select_exercise_query = f"SELECT * FROM memory_state WHERE theme = '{theme}'"  # pylint: disable=invalid-name
     else:
-        select_exercise_query = "SELECT * FROM memory_state"
+        select_exercise_query = "SELECT * FROM memory_state"  # pylint: disable=invalid-name
 
     exercises = (
         con.execute(select_exercise_query)
