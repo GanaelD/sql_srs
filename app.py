@@ -33,16 +33,21 @@ Spaced Repetition System SQL practice
 )
 
 with st.sidebar:
+    available_themes_df = con.execute("SELECT DISTINCT theme FROM memory_state").df()
     theme: Optional[str] = st.selectbox(
         "What would you like to review?",
-        ("joins", "group_by", "window_functions"),
+        available_themes_df["theme"].unique(),
         index=None,
         placeholder="Select a theme...",
     )
-    st.write(f"You selected: {theme}")
+    if theme:
+        st.write(f"You selected: {theme}")
+        select_exercise_query = f"SELECT * FROM memory_state WHERE theme = '{theme}'"  # pylint: disable=invalid-name
+    else:
+        select_exercise_query = "SELECT * FROM memory_state"  # pylint: disable=invalid-name
 
     exercises = (
-        con.execute(f"SELECT * FROM memory_state WHERE theme = '{theme}'")
+        con.execute(select_exercise_query)
         .df()
         .sort_values("last_reviewed")
         .reset_index()
