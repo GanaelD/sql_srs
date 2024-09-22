@@ -3,6 +3,7 @@ import logging
 import os
 import subprocess
 import sys
+from datetime import date, timedelta
 from typing import Optional
 
 import duckdb
@@ -101,6 +102,22 @@ st.header("Enter your code:")
 query: Optional[str] = st.text_area(label="Your SQL query goes here", key="user_input")
 if query:
     check_user_solution(query)
+
+n_days_options = [2, 7, 21]
+for n_days in n_days_options:
+    if st.button(f"Review in {n_days} days"):
+        next_review = date.today() + timedelta(days=n_days)
+        con.execute(
+            f"""
+            UPDATE memory_state
+            SET last_reviewed = '{next_review}'
+            WHERE exercise_name = '{exercise_name}'"""
+        )
+        st.rerun()
+
+if st.button("Reset"):
+    con.execute("UPDATE memory_state SET last_reviewed = '1970-01-01'")
+    st.rerun()
 
 tab2, tab3 = st.tabs(["Tables", "Answer"])
 
